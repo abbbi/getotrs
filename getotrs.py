@@ -42,11 +42,14 @@ def unpack(file):
     m = magic.open(magic.MIME)
     m.load()
     if 'application/zip' in m.file(file):
-        with zipfile.ZipFile(file) as zf:
-            try:
-                zf.extractall(destdir)
-            except:
-                print 'error decompressing'
+        try:
+            with zipfile.ZipFile(file) as zf:
+                try:
+                    zf.extractall(destdir)
+                except:
+                    print 'error decompressing'
+        except zipfile.BadZipfile:
+            print 'Error: file is not a correct zipfile'
 
 try:
     browser.open(base_url+otrs_path)

@@ -3,7 +3,7 @@ getotrs
 
 Download otrs ticket attachments. Based on the ticket-id syncs all attachments
 to a local folder and if desired decompresses possible archives. Also downloads
-the printable pdf version the ticket created by otrs.
+the printable pdf version of the ticket created by otrs.
 
 USAGE
 ------------
@@ -20,7 +20,7 @@ optional arguments:
   --pw PW          OTRS Password
   --folder FOLDER  Folder to download stuff (default full subject ticket id)
   --pdf            Download ticket as printable PDF
-  --unpack         Decompress downloaded files based on filetype (zip, tar.gz)
+  --unpack         Decompress downloaded files based on filetype (.zip)
 </pre>
 
 EXAMPLE
