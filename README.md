@@ -1,7 +1,9 @@
 getotrs
 =======
 
-Download otrs ticket attachments to local folder
+Download otrs ticket attachments. Based on the ticket-id syncs all attachments
+to a local folder and if desired decompresses possible archives. Also downloads
+the printable pdf version the ticket created by otrs.
 
 USAGE
 ------------
