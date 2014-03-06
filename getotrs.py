@@ -24,7 +24,6 @@ password = args.pw
 
 browser=mechanize.Browser()
 
-
 def unpack(file):
     destdir=file+'_data/'
 
@@ -34,7 +33,11 @@ def unpack(file):
 
     print 'Try to decompress into: ' + destdir
 
-    os.makedirs(destdir)
+    try:
+        os.makedirs(destdir)
+    except OSError, e:
+        print 'Error creating directory:'+ e.strerror
+        exit(1)
 
     m = magic.open(magic.MIME)
     m.load()
@@ -45,7 +48,6 @@ def unpack(file):
             except:
                 print 'error decompressing'
 
-
 try:
     browser.open(base_url+otrs_path)
 except mechanize.URLError, e:
@@ -54,7 +56,6 @@ except mechanize.URLError, e:
 except mechanize.HTTPError, e:
     print 'ERROR downloading:' + str(e)
     exit(1)
-
 
 browser.select_form(name='login')
 browser['User'] = username
