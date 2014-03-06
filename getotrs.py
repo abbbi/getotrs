@@ -47,11 +47,15 @@ if 'Login failed!' in data.get_text():
     exit(1)
 
 if args.folder:
-    target_folder= args.folder
+    if '_ticketid_' in args.folder:
+        target_folder = args.folder.replace('_ticketid_', data.title.string.split(' ')[0])
+    else:
+        target_folder= args.folder
 else:
     target_folder =  data.title.string.split(' ')[0]
 
 print 'Target Folder:' + target_folder
+exit(1)
 
 attachments=[]
 for a in data.find_all('a', href=True):

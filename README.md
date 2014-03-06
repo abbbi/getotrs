@@ -35,6 +35,21 @@ Download ticket as printable PDF:
 
  getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --pdf
 
+Predefined path, _ticketid_ is replaced with real ticket number, so files go to /logfiles/<ticketnumber>:
+
+ getotrs.py --url https://otrs.url.de/ --user username --pw password --folder /logfiles/_ticketid_ --ticket 7496
+
+
+BASHRC
+------------
+
+ alias getotrs='python /path/to/getotrs.py --url https://otrs.url.de/ --user username --pw password --folder /logfiles/_ticketid_ --ticket'
+
+So simply:
+
+ getotrs 7545
+
+will do the job and places ticket information to /logfiles/2014030680000094 for example.
 
 DEPENDENCIES
 ------------
