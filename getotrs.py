@@ -84,19 +84,31 @@ if args.pdf:
         print 'Error retrieving PDF file'
 
 if len(attachments) > 0:
+    processed=[]
     for file in attachments:
         t = file.split('?')
         n = t[0].split('/')
-        if not os.path.exists(target_folder + '/' + n[3]):
-            print 'Downloading:' + base_url+file
+        
+        filename = n[3];
+
+        fc = processed.count(n[3]);
+
+        if fc > 0:
+            nfc=fc+1
+            filename=str(nfc)+'_'+filename
+
+        if not os.path.exists(target_folder + '/' + filename):
+            print 'Downloading:' + base_url+file + ' to: ' + target_folder + '/' + filename
             try:
-                browser.retrieve(base_url+file, target_folder + '/' + n[3])
+                browser.retrieve(base_url+file, target_folder + '/' + filename)
+                processed.append(filename)
             except mechanize.URLError, e:
                 print 'ERROR downloading file:' + str(e)
             except mechanize.HTTPError, e:
                 print 'ERROR downloading file:' + str(e)
         else:
-            print 'Skipping file' + n[3] + ': already exists'
+            processed.append(filename)
+            print 'Skipping file ' + filename + ': already exists'
 else:
     print 'No attachments found'
 

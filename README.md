@@ -60,6 +60,7 @@ additional packages may have to be installed (debian):
  python-mechanize
 </pre>
 
-TODO
+TRIVIA
 ------------
- * does not handle attachments with different contents but same attachment name
+If a file with the same name is attached to the ticket twice, the filename will be appended
+with an upcounting number (foo, 2_foo), 3_foo) and so on.
