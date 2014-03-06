@@ -23,6 +23,6 @@ optional arguments:
 EXAMPLE
 ------------
 <pre>
-getotrs.py --url https://otrs.url.de/ --ticket 'otrs/index.pl?Action=AgentTicketZoom;TicketID=7496' --user username --pw password
+getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password
 </pre>
 

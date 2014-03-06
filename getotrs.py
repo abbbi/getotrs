@@ -7,14 +7,14 @@ from bs4 import BeautifulSoup
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--url', help='Base URL to otrs (http://host/)', type=str, required=1)
-parser.add_argument('--ticket', help='Ticket URL to download (otrs/index.pl?Action=AgentTicketZoom;TicketID=7496)', type=str, required=1)
+parser.add_argument('--ticket', help='Ticket ID as seen in URL (TicketID=7496 = 7496)', type=str, required=1)
 parser.add_argument('--user', help='OTRS Username', type=str, required=1)
 parser.add_argument('--pw', help='OTRS Password', type=str, required=1)
 parser.add_argument('--folder', help='Folder to download stuff (default full subject ticket id)', type=str, required=0)
 args = parser.parse_args()
 
 base_url = args.url
-otrs_path = args.ticket
+otrs_path = 'otrs/index.pl?Action=AgentTicketZoom;TicketID=' + args.ticket
 username = args.user
 password = args.pw
 
@@ -63,7 +63,7 @@ if not os.path.exists(target_folder):
     os.makedirs(target_folder)
 
 for file in attachments:
-    print base_url+file
     t = file.split('?')
     n = t[0].split('/')
+    print 'Downloading:' + base_url+file
     browser.retrieve(base_url+file, target_folder + '/' + n[3])
