@@ -92,7 +92,7 @@ if args.folder:
 else:
     target_folder =  data.title.string.split(' ')[0]
 
-print 'Target Folder:' + target_folder
+print 'Target Folder: ' + target_folder
 
 attachments=[]
 for a in data.find_all('a', href=True):
