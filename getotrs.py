@@ -69,4 +69,6 @@ for file in attachments:
         print 'Downloading:' + base_url+file
         browser.retrieve(base_url+file, target_folder + '/' + n[3])
     else:
-        print "Skipping file, already exists"
+        print 'Skipping file' + n[3] + ': already exists'
+
+browser.close()
