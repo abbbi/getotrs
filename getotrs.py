@@ -1,13 +1,20 @@
 #!/usr/bin/env python
+import argparse
 import mechanize
 import requests
 from bs4 import BeautifulSoup
 
-username='user'
-password="pass"
+parser = argparse.ArgumentParser()
+parser.add_argument("--url", help="Base URL to otrs (http://host/)", type=str, required=1)
+parser.add_argument("--ticket", help="Ticket URL to download (otrs/index.pl?Action=AgentTicketZoom;TicketID=7496)", type=str, required=1)
+parser.add_argument("--user", help="OTRS Username", type=str, required=1)
+parser.add_argument("--pw", help="OTRS Password", type=str, required=1)
+args = parser.parse_args()
 
-base_url = 'https://otrsurl.de/'
-otrs_path = 'otrs/index.pl?Action=AgentTicketZoom;TicketID=7545;ArticleID=56272;ZoomExpand=1'
+base_url = args.url
+otrs_path = args.ticket
+username = args.user
+password = args.pw
 
 browser=mechanize.Browser()
 
@@ -18,6 +25,10 @@ browser['Password'] = password
 browser.submit()
 
 data = BeautifulSoup(browser.response().read())
+
+if 'Login failed!' in data.get_text():
+    print 'Login failed! Your username or password was entered incorrectly.'
+    exit
 
 attachments=[]
 for a in data.find_all('a', href=True):
