@@ -8,7 +8,7 @@ USAGE
 
 <pre>
 usage: getotrs.py [-h] --url URL --ticket TICKET --user USER --pw PW
-                  [--folder FOLDER] [--pdf]
+                  [--folder FOLDER] [--pdf] [--unpack]
 
 optional arguments:
   -h, --help       show this help message and exit
@@ -18,6 +18,7 @@ optional arguments:
   --pw PW          OTRS Password
   --folder FOLDER  Folder to download stuff (default full subject ticket id)
   --pdf            Download ticket as printable PDF
+  --unpack         Decompress downloaded files based on filetype (zip, tar.gz)
 </pre>
 
 EXAMPLE
@@ -31,13 +32,17 @@ Download attachments to specified folder:
 
  getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --folder download
 
+Download attachments to specified folder and decompress zipped attachments:
+
+ getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --folder download --unpack
+
 Download ticket as printable PDF:
 
  getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --pdf
 
-Predefined path, _ticketid_ is replaced with real ticket number, so files go to /logfiles/<ticketnumber>:
+Predefined path, __ticketid__ is replaced with real ticket number, so files go to /logfiles/<ticketnumber>:
 
- getotrs.py --url https://otrs.url.de/ --user username --pw password --folder /logfiles/_ticketid_ --ticket 7496
+ getotrs.py --url https://otrs.url.de/ --user username --pw password --folder /logfiles/__ticketid__ --ticket 7496
 
 
 BASHRC
@@ -58,6 +63,7 @@ additional packages may have to be installed (debian):
 <pre>
  python-bs4
  python-mechanize
+ python-magic
 </pre>
 
 TRIVIA

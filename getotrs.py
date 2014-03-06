@@ -3,6 +3,8 @@ import os
 import argparse
 import mechanize
 import requests
+import zipfile
+import magic
 from bs4 import BeautifulSoup
 
 parser = argparse.ArgumentParser()
@@ -12,6 +14,7 @@ parser.add_argument('--user', help='OTRS Username', type=str, required=1)
 parser.add_argument('--pw', help='OTRS Password', type=str, required=1)
 parser.add_argument('--folder', help='Folder to download stuff (default full subject ticket id)', type=str, required=0)
 parser.add_argument('--pdf', help='Download ticket as printable PDF', action='store_true', required=0)
+parser.add_argument('--unpack', help='Decompress downloaded files based on filetype (zip, tar.gz)', action='store_true', required=0)
 args = parser.parse_args()
 
 base_url = args.url
@@ -20,6 +23,28 @@ username = args.user
 password = args.pw
 
 browser=mechanize.Browser()
+
+
+def unpack(file):
+    destdir=file+'_data/'
+
+    if os.path.exists(destdir):
+        print 'Skip decompress, already exists: ' + destdir
+        return
+
+    print 'Try to decompress into: ' + destdir
+
+    os.makedirs(destdir)
+
+    m = magic.open(magic.MIME)
+    m.load()
+    if 'application/zip' in m.file(file):
+        with zipfile.ZipFile(file) as zf:
+            try:
+                zf.extractall(destdir)
+            except:
+                print 'error decompressing'
+
 
 try:
     browser.open(base_url+otrs_path)
@@ -97,17 +122,23 @@ if len(attachments) > 0:
             nfc=fc+1
             filename=str(nfc)+'_'+filename
 
-        if not os.path.exists(target_folder + '/' + filename):
-            print 'Downloading:' + base_url+file + ' to: ' + target_folder + '/' + filename
+        targetfile = target_folder + '/' + filename
+
+        if not os.path.exists(targetfile):
+            print 'Downloading:' + base_url+file + ' to: ' + targetfile
             try:
-                browser.retrieve(base_url+file, target_folder + '/' + filename)
+                browser.retrieve(base_url+file, targetfile)
                 processed.append(filename)
+                if args.unpack:
+                    unpack(targetfile)
             except mechanize.URLError, e:
                 print 'ERROR downloading file:' + str(e)
             except mechanize.HTTPError, e:
                 print 'ERROR downloading file:' + str(e)
         else:
             processed.append(filename)
+            if args.unpack:
+                unpack(targetfile)
             print 'Skipping file ' + filename + ': already exists'
 else:
     print 'No attachments found'
