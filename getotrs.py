@@ -15,7 +15,7 @@ parser.add_argument('--pdf', help='Download ticket as printable PDF', action='st
 args = parser.parse_args()
 
 base_url = args.url
-otrs_path = 'otrs/index.pl?Action=AgentTicketZoom;TicketID=' + args.ticket
+otrs_path = 'otrs/index.pl?Action=AgentTicketZoom;TicketID=' + args.ticket + ';ZoomExpand=1'
 username = args.user
 password = args.pw
 
@@ -65,8 +65,9 @@ for a in data.find_all('a', href=True):
     if 'Action=Logout' in a['href']:
         logout_url = a['href']
         print 'Logout URL: ' + logout_url
-    if 'AgentTicketPrint' in a['href']:
-        pdf_url = a['href'];
+    if 'AgentTicketPrint;TicketID' in a['href']:
+        if not 'ArticleID' in a['href']:
+            pdf_url = a['href'];
 
 if not os.path.exists(target_folder):
     try:
@@ -74,6 +75,13 @@ if not os.path.exists(target_folder):
     except OSError, e:
         print 'Error creating directory:'+ e.strerror
         exit(1)
+
+if args.pdf:
+    print 'Download ticket PDF file: ' + target_folder + '/ticketdata.pdf'
+    try:
+        browser.retrieve(base_url+pdf_url, target_folder + '/ticketdata.pdf')
+    except:
+        print 'Error retrieving PDF file'
 
 if len(attachments) > 0:
     for file in attachments:
@@ -91,13 +99,6 @@ if len(attachments) > 0:
             print 'Skipping file' + n[3] + ': already exists'
 else:
     print 'No attachments found'
-
-if args.pdf:
-    print 'Download ticket PDF file:' 
-    try:
-        browser.retrieve(base_url+pdf_url, target_folder + '/ticketdata.pdf')
-    except:
-        print 'Error retrieving PDF file'
 
 print 'Logout'
 p = browser.click_link(url=logout_url)
