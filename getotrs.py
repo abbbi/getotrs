@@ -97,8 +97,8 @@ print 'Target Folder:' + target_folder
 attachments=[]
 for a in data.find_all('a', href=True):
     if 'AgentTicketAttachment' in a['href']:
-        print 'Found Attachment:', a['href']
         if a['href'] not in attachments:
+            print 'Found Attachment:', a['href']
             attachments.append(a['href'])
     if 'Action=Logout' in a['href']:
         logout_url = a['href']
