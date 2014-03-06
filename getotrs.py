@@ -65,5 +65,8 @@ if not os.path.exists(target_folder):
 for file in attachments:
     t = file.split('?')
     n = t[0].split('/')
-    print 'Downloading:' + base_url+file
-    browser.retrieve(base_url+file, target_folder + '/' + n[3])
+    if not os.path.exists(target_folder + '/' + n[3]):
+        print 'Downloading:' + base_url+file
+        browser.retrieve(base_url+file, target_folder + '/' + n[3])
+    else:
+        print "Skipping file, already exists"
