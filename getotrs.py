@@ -4,6 +4,7 @@ import argparse
 import mechanize
 import requests
 import zipfile
+import tarfile
 import magic
 from bs4 import BeautifulSoup
 
@@ -41,7 +42,8 @@ def unpack(file):
 
     m = magic.open(magic.MIME)
     m.load()
-    if 'application/zip' in m.file(file):
+    type = m.file(file)
+    if 'application/zip' in type:
         try:
             with zipfile.ZipFile(file) as zf:
                 try:
@@ -50,6 +52,13 @@ def unpack(file):
                     print 'error decompressing'
         except zipfile.BadZipfile:
             print 'Error: file is not a correct zipfile'
+    elif 'application/x-gzip' in type:
+        if tarfile.is_tarfile(file):
+            try:
+                with tarfile.TarFile.open(file) as tf:
+                    tf.extractall(destdir)
+            except tarfile.ExtractError, e:
+                print 'error decompressing' + str(e)
 
 try:
     browser.open(base_url+otrs_path)

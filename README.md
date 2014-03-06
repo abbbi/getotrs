@@ -20,7 +20,7 @@ optional arguments:
   --pw PW          OTRS Password
   --folder FOLDER  Folder to download stuff (default full subject ticket id)
   --pdf            Download ticket as printable PDF
-  --unpack         Decompress downloaded files based on filetype (.zip)
+  --unpack         Decompress downloaded files based on filetype (zip, tar.gz)
 </pre>
 
 EXAMPLE
