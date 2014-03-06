@@ -11,6 +11,7 @@ parser.add_argument('--ticket', help='Ticket ID as seen in URL (TicketID=7496 = 
 parser.add_argument('--user', help='OTRS Username', type=str, required=1)
 parser.add_argument('--pw', help='OTRS Password', type=str, required=1)
 parser.add_argument('--folder', help='Folder to download stuff (default full subject ticket id)', type=str, required=0)
+parser.add_argument('--pdf', help='Download ticket as printable PDF', action='store_true', required=0)
 args = parser.parse_args()
 
 base_url = args.url
@@ -61,6 +62,8 @@ for a in data.find_all('a', href=True):
     if 'Action=Logout' in a['href']:
         logout_url = a['href']
         print 'Logout URL: ' + logout_url
+    if 'AgentTicketPrint' in a['href']:
+        pdf_url = a['href'];
 
 if not os.path.exists(target_folder):
     os.makedirs(target_folder)
@@ -78,6 +81,13 @@ for file in attachments:
             print 'ERROR downloading file:' + str(e)
     else:
         print 'Skipping file' + n[3] + ': already exists'
+
+if args.pdf:
+    print 'Download ticket PDF file:' 
+    try:
+        browser.retrieve(base_url+pdf_url, target_folder + '/ticketdata.pdf')
+    except:
+        print 'Error retrieving PDF file'
 
 print 'Logout'
 p = browser.click_link(url=logout_url)

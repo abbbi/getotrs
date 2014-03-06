@@ -8,15 +8,16 @@ USAGE
 
 <pre>
 usage: getotrs.py [-h] --url URL --ticket TICKET --user USER --pw PW
-                  [--folder FOLDER]
+                  [--folder FOLDER] [--pdf]
 
 optional arguments:
   -h, --help       show this help message and exit
-  --url URL        Base URL to otrs (https://host/)
+  --url URL        Base URL to otrs (http://host/)
   --ticket TICKET  Ticket ID as seen in URL (TicketID=7496 = 7496)
   --user USER      OTRS Username
   --pw PW          OTRS Password
   --folder FOLDER  Folder to download stuff (default full subject ticket id)
+  --pdf            Download ticket as printable PDF
 </pre>
 
 EXAMPLE
@@ -29,6 +30,11 @@ Download all attachments to automatically created folder:
 Download attachments to specified folder:
 
  getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --folder download
+
+Download ticket as printable PDF:
+
+ getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --pdf
+
 
 DEPENDENCIES
 ------------
