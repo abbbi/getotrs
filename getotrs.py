@@ -58,6 +58,9 @@ for a in data.find_all('a', href=True):
         print 'Found Attachment:', a['href']
         if a['href'] not in attachments:
             attachments.append(a['href'])
+    if 'Action=Logout' in a['href']:
+        logout_url = a['href']
+        print 'Logout URL: ' + logout_url
 
 if not os.path.exists(target_folder):
     os.makedirs(target_folder)
@@ -71,4 +74,10 @@ for file in attachments:
     else:
         print 'Skipping file' + n[3] + ': already exists'
 
+print 'Logout'
+p = browser.click_link(url=logout_url)
+browser.open(p)
+resp =  BeautifulSoup(browser.response().read())
+if 'Abmelden' or 'Logout' in  resp.title.string:
+    print "Ok"
 browser.close()
