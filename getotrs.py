@@ -66,21 +66,28 @@ for a in data.find_all('a', href=True):
         pdf_url = a['href'];
 
 if not os.path.exists(target_folder):
-    os.makedirs(target_folder)
+    try:
+        os.makedirs(target_folder)
+    except OSError, e:
+        print 'Error creating directory:'+ e.strerror
+        exit(1)
 
-for file in attachments:
-    t = file.split('?')
-    n = t[0].split('/')
-    if not os.path.exists(target_folder + '/' + n[3]):
-        print 'Downloading:' + base_url+file
-        try:
-            browser.retrieve(base_url+file, target_folder + '/' + n[3])
-        except mechanize.URLError, e:
-            print 'ERROR downloading file:' + str(e)
-        except mechanize.HTTPError, e:
-            print 'ERROR downloading file:' + str(e)
-    else:
-        print 'Skipping file' + n[3] + ': already exists'
+if len(attachments) > 0:
+    for file in attachments:
+        t = file.split('?')
+        n = t[0].split('/')
+        if not os.path.exists(target_folder + '/' + n[3]):
+            print 'Downloading:' + base_url+file
+            try:
+                browser.retrieve(base_url+file, target_folder + '/' + n[3])
+            except mechanize.URLError, e:
+                print 'ERROR downloading file:' + str(e)
+            except mechanize.HTTPError, e:
+                print 'ERROR downloading file:' + str(e)
+        else:
+            print 'Skipping file' + n[3] + ': already exists'
+else:
+    print 'No attachments found'
 
 if args.pdf:
     print 'Download ticket PDF file:' 
