@@ -55,7 +55,6 @@ else:
     target_folder =  data.title.string.split(' ')[0]
 
 print 'Target Folder:' + target_folder
-exit(1)
 
 attachments=[]
 for a in data.find_all('a', href=True):
