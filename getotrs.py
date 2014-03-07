@@ -85,11 +85,7 @@ def set_target_folder(data):
     print 'Target Folder: ' + target_folder
 
     if not os.path.exists(target_folder):
-        try:
-            os.makedirs(target_folder)
-        except OSError, e:
-            print 'Error creating directory:'+ e.strerror
-            exit(1)
+        createdir(target_folder)
 
     return target_folder
 
@@ -118,7 +114,6 @@ def download_pdf(pdf_url, target_folder):
             print 'Error retrieving PDF file'
 
 def download_attachments(attachments, target_folder):
-
 	if len(attachments) > 0:
 	    processed=[]
 	    for file in attachments:
@@ -162,8 +157,6 @@ def logout(logout_url):
 	if 'Abmelden' or 'Logout' in  resp.title.string:
 	    print "Ok"
 	browser.close()
-
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
