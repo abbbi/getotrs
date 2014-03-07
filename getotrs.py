@@ -133,7 +133,6 @@ def download_attachments(attachments, target_folder):
 
             if not os.path.exists(targetfile):
                 print 'Downloading:' + base_url+file + ' to: ' + targetfile
-                print targetfile.encode('utf-8')
                 try:
                     browser.retrieve(base_url+file.encode('ascii', 'ignore'), targetfile.encode('ascii', 'ignore'))
                     processed.append(filename)
