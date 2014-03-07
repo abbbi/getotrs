@@ -114,49 +114,49 @@ def download_pdf(pdf_url, target_folder):
             print 'Error retrieving PDF file'
 
 def download_attachments(attachments, target_folder):
-	if len(attachments) > 0:
-	    processed=[]
-	    for file in attachments:
-	        t = file.split('?')
-	        n = t[0].split('/')
-	        
-	        filename = n[3];
-	
-	        fc = processed.count(n[3]);
-	
-	        if fc > 0:
-	            nfc=fc+1
-	            filename=str(nfc)+'_'+filename
-	
-	        targetfile = target_folder + '/' + filename
-	
-	        if not os.path.exists(targetfile):
-	            print 'Downloading:' + base_url+file + ' to: ' + targetfile
-	            try:
-	                browser.retrieve(base_url+file, targetfile)
-	                processed.append(filename)
-	                if args.unpack:
-	                    unpack(targetfile)
-	            except mechanize.URLError, e:
-	                print 'ERROR downloading file:' + str(e)
-	            except mechanize.HTTPError, e:
-	                print 'ERROR downloading file:' + str(e)
-	        else:
-	            processed.append(filename)
-	            if args.unpack:
-	                unpack(targetfile)
-	            print 'Skipping file ' + filename + ': already exists'
-	else:
-	    print 'No attachments found'
+    if len(attachments) > 0:
+        processed=[]
+        for file in attachments:
+            t = file.split('?')
+            n = t[0].split('/')
+
+            filename = n[3];
+
+            fc = processed.count(n[3]);
+
+            if fc > 0:
+                nfc=fc+1
+                filename=str(nfc)+'_'+filename
+
+            targetfile = target_folder + '/' + filename
+
+            if not os.path.exists(targetfile):
+                print 'Downloading:' + base_url+file + ' to: ' + targetfile
+                try:
+                    browser.retrieve(base_url+file, targetfile)
+                    processed.append(filename)
+                    if args.unpack:
+                        unpack(targetfile)
+                except mechanize.URLError, e:
+                    print 'ERROR downloading file:' + str(e)
+                except mechanize.HTTPError, e:
+                    print 'ERROR downloading file:' + str(e)
+            else:
+                processed.append(filename)
+                if args.unpack:
+                    unpack(targetfile)
+                print 'Skipping file ' + filename + ': already exists'
+    else:
+        print 'No attachments found'
 
 def logout(logout_url):
-	print 'Logout'
-	p = browser.click_link(url=logout_url)
-	browser.open(p)
-	resp =  BeautifulSoup(browser.response().read())
-	if 'Abmelden' or 'Logout' in  resp.title.string:
-	    print "Ok"
-	browser.close()
+    print 'Logout'
+    p = browser.click_link(url=logout_url)
+    browser.open(p)
+    resp =  BeautifulSoup(browser.response().read())
+    if 'Abmelden' or 'Logout' in  resp.title.string:
+        print "Ok"
+    browser.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -168,12 +168,12 @@ if __name__ == "__main__":
     parser.add_argument('--pdf', help='Download ticket as printable PDF', action='store_true', required=0)
     parser.add_argument('--unpack', help='Decompress downloaded files based on filetype (zip, tar.gz)', action='store_true', required=0)
     args = parser.parse_args()
-	
+
     base_url = args.url
     otrs_path = 'otrs/index.pl?Action=AgentTicketZoom;TicketID=' + args.ticket + ';ZoomExpand=1'
     username = args.user
     password = args.pw
-	
+
     browser=mechanize.Browser()
     data = login()
     tf = set_target_folder(data)
