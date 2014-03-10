@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: iso-8859-15 -*-
 import os
 import argparse
 import mechanize
@@ -109,10 +108,19 @@ def find_attachments(data):
 def download_pdf(pdf_url, target_folder):
     if args.pdf:
         print 'Download ticket PDF file: ' + target_folder + '/ticketdata.pdf'
-        try:
-            browser.retrieve(base_url+pdf_url, target_folder + '/ticketdata.pdf')
-        except:
-            print 'Error retrieving PDF file'
+        if browser_retrieve(base_url+pdf_url, target_folder + '/ticketdata.pdf'):
+            print "OK"
+
+def browser_retrieve(source, dest):
+    try:
+        browser.retrieve(source.encode('ascii', 'ignore'), dest.encode('ascii', 'ignore'))
+        return True
+    except mechanize.URLError, e:
+        print 'ERROR downloading file:' + str(e)
+        return False
+    except mechanize.HTTPError, e:
+        print 'ERROR downloading file:' + str(e)
+        return False
 
 def download_attachments(attachments, target_folder):
     if len(attachments) > 0:
@@ -133,15 +141,12 @@ def download_attachments(attachments, target_folder):
 
             if not os.path.exists(targetfile):
                 print 'Downloading:' + base_url+file + ' to: ' + targetfile
-                try:
-                    browser.retrieve(base_url+file.encode('ascii', 'ignore'), targetfile.encode('ascii', 'ignore'))
+                if browser_retrieve(base_url+file, targetfile):
                     processed.append(filename)
                     if args.unpack:
                         unpack(targetfile)
-                except mechanize.URLError, e:
-                    print 'ERROR downloading file:' + str(e)
-                except mechanize.HTTPError, e:
-                    print 'ERROR downloading file:' + str(e)
+                else:
+                    print "Error downloading"
             else:
                 processed.append(filename)
                 if args.unpack:
