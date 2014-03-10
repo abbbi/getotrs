@@ -25,6 +25,7 @@ def unpack(file):
             with zipfile.ZipFile(file) as zf:
                 try:
                     zf.extractall(destdir)
+                    zf.close()
                 except:
                     print 'error decompressing'
         except zipfile.BadZipfile:
@@ -36,6 +37,7 @@ def unpack(file):
             try:
                 with tarfile.TarFile.open(file) as tf:
                     tf.extractall(destdir)
+                    tf.close()
             except tarfile.ExtractError, e:
                 print 'error decompressing' + str(e)
 
