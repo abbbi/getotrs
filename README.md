@@ -44,8 +44,9 @@ Download ticket as printable PDF:
 
 Predefined path, __ticketid__ is replaced with real ticket number, so files go to /logfiles/<ticketnumber>:
 
- getotrs.py --url https://otrs.url.de/ --user username --pw password --folder /logfiles/__ticketid__ --ticket 7496
-
+<pre>
+ getotrs.py --url https://otrs.url.de/ --user username --pw password --folder /logfiles/_ticketid_ --ticket 7496
+</pre>
 
 BASHRC
 ------------
