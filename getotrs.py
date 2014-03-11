@@ -18,6 +18,10 @@ def unpack(file):
     m = magic.open(magic.MIME)
     m.load()
     type = m.file(file)
+
+    if 'text/plain' in type:
+        return
+
     if 'application/zip' in type:
         print 'Decompress .zip into: ' + destdir
         createdir(destdir)
@@ -30,7 +34,7 @@ def unpack(file):
                     print 'error decompressing'
         except zipfile.BadZipfile:
             print 'Error: file is not a correct zipfile'
-    elif 'application/x-gzip' in type:
+    elif 'application/x-gzip' in type or 'application/x-tar' in type:
         print 'Decompress .tar.z into: ' + destdir
         createdir(destdir)
         if tarfile.is_tarfile(file):
