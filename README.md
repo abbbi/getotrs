@@ -50,7 +50,9 @@ Predefined path, __ticketid__ is replaced with real ticket number, so files go t
 BASHRC
 ------------
 
+<pre>
  alias getotrs='python /path/to/getotrs.py --url https://otrs.url.de/ --user username --pw password --folder /logfiles/_ticketid_ --ticket'
+</pre>
 
 So simply:
 
