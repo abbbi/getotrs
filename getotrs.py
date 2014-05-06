@@ -131,17 +131,18 @@ def browser_retrieve(source, dest):
 def download_attachments(attachments, target_folder):
     if len(attachments) > 0:
         processed=[]
+        fc = 0
         for file in attachments:
             t = file.split('?')
             n = t[0].split('/')
 
             filename = n[3];
 
-            fc = processed.count(n[3]);
+            pc = processed.count(filename);
 
-            if fc > 0:
-                nfc=fc+1
-                filename=str(nfc)+'_'+filename
+            if pc > 0:
+                fc=fc+1
+                filename=str(fc)+'_'+filename
 
             targetfile = target_folder + '/' + filename
 
