@@ -5,7 +5,10 @@ import mechanize
 import requests
 import zipfile
 import tarfile
-import magic
+import sys
+if not 'win32' in sys.platform:
+    import magic
+
 from bs4 import BeautifulSoup
 
 def unpack(file):
@@ -15,14 +18,18 @@ def unpack(file):
         print 'Skip decompress, already exists: ' + destdir
         return
 
-    m = magic.open(magic.MIME)
-    m.load()
-    type = m.file(file)
+    if not 'win32' in sys.platform:
+        m = magic.open(magic.MIME)
+        m.load()
+        type = m.file(file)
+    else:
+        print "lala"
+        type = file 
 
-    if 'text/plain' in type:
+    if 'text/plain' in type or type.endswith('.txt'):
         return
 
-    if 'application/zip' in type:
+    if 'application/zip' in type or type.endswith('.zip'):
         print 'Decompress .zip into: ' + destdir
         createdir(destdir)
         try:
@@ -34,7 +41,7 @@ def unpack(file):
                     print 'error decompressing'
         except zipfile.BadZipfile:
             print 'Error: file is not a correct zipfile'
-    elif 'application/x-gzip' in type or 'application/x-tar' in type:
+    elif 'application/x-gzip' in type or 'application/x-tar' in type or type.endswith('.tar.gz'):
         print 'Decompress .tar.z into: ' + destdir
         createdir(destdir)
         if tarfile.is_tarfile(file):
