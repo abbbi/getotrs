@@ -23,7 +23,6 @@ def unpack(file):
         m.load()
         type = m.file(file)
     else:
-        print "lala"
         type = file 
 
     if 'text/plain' in type or type.endswith('.txt'):
