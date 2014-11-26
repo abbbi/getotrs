@@ -93,13 +93,22 @@ def get_json_data(username,password, url):
 
 def find_attachments(data):
     attachments = []
+
+    if len(data) < 1:
+        print 'No valid json data found'
+        sys.exit(1)
+
+    cnt=0
     for td in data['Ticket']:
+        print 'Ticket has %s articles' % len(td['Article'])
         for article in td['Article']:
+            cnt=cnt+1
             try:
+                print 'Article %s has %s attachments' % (cnt, len(article['Attachment']))
                 for file in article['Attachment']:
                     attachments.append({ 'filename': file['Filename'], 'content' : file['Content']})
             except KeyError:
-                print "no attachment for this article"
+                print "No attachment for Article %s" % cnt
 
     return attachments
 
@@ -150,6 +159,6 @@ if __name__ == "__main__":
     url = args.url+args.ticket
 
     data = get_json_data(username,password,url)
-    attachments = find_attachments(data)
     tf = set_target_folder(data['Ticket'][0]['TicketNumber'])
+    attachments = find_attachments(data)
     save_attachments(attachments, tf )
