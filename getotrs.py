@@ -85,9 +85,10 @@ def get_json_data(username,password, url):
         'Attachments' : '1'
     }
     try:
-        r = requests.get(url, params=payload)
-    except e:
+        r = requests.get(url, params=payload, verify=False)
+    except Exception as e:
         print 'Error accesing api %s', e
+        sys.exit(1)
 
     return json.loads(r.content)
 
