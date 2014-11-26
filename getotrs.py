@@ -161,9 +161,16 @@ if __name__ == "__main__":
     username = args.user
     password = args.pw
 
-    url = args.url+args.ticket
+    tl=[]
+    if ':' in args.ticket:
+        tl = args.ticket.split(':')
+    else:
+        tl.append(args.ticket)
 
-    data = get_json_data(username,password,url)
-    tf = set_target_folder(data['Ticket'][0]['TicketNumber'])
-    attachments = find_attachments(data)
-    save_attachments(attachments, tf )
+    for ticket in tl:
+        url = args.url+ticket
+
+        data = get_json_data(username,password,url)
+        tf = set_target_folder(data['Ticket'][0]['TicketNumber'])
+        attachments = find_attachments(data)
+        save_attachments(attachments, tf )
