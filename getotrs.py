@@ -12,6 +12,7 @@ if not 'win32' in sys.platform:
 from bs4 import BeautifulSoup
 
 def unpack(file):
+    file = file.encode('utf-8')
     destdir=file+'_data/'
 
     if os.path.exists(destdir):
@@ -22,8 +23,13 @@ def unpack(file):
         m = magic.open(magic.MIME)
         m.load()
         type = m.file(file)
+        if type == None:
+            type = file
     else:
         type = file 
+
+
+    print "TYPE:" + str(type)
 
     if 'text/plain' in type or type.endswith('.txt'):
         return
@@ -103,17 +109,18 @@ def set_target_folder(data):
 
 def find_attachments(data):
     attachments=[]
-    for a in data.find_all('a', href=True):
+    for a in data.find_all('a', href=True, text=True):
         if 'AgentTicketAttachment' in a['href']:
             if a['href'] not in attachments:
                 print 'Found Attachment:', a['href']
-                attachments.append(a['href'])
-        if 'Action=Logout' in a['href']:
-            logout_url = a['href']
-            print 'Logout URL: ' + logout_url
+                attachments.append({'link': a['href'], 'filename':  a.get_text()})
         if 'AgentTicketPrint;TicketID' in a['href']:
             if not 'ArticleID' in a['href']:
                 pdf_url = a['href'];
+
+    for l in data.find_all('a',  {'class':"LogoutButton"}):
+        logout_url=l['href']
+        print 'Logout URL: ' + logout_url
 
     return attachments, logout_url, pdf_url
 
@@ -139,10 +146,7 @@ def download_attachments(attachments, target_folder):
         processed=[]
         fc = 0
         for file in attachments:
-            t = file.split('?')
-            n = t[0].split('/')
-
-            filename = n[3];
+            filename = file['filename'];
 
             pc = processed.count(filename);
 
@@ -153,8 +157,8 @@ def download_attachments(attachments, target_folder):
             targetfile = target_folder + '/' + filename
 
             if not os.path.exists(targetfile):
-                print 'Downloading:' + base_url+file + ' to: ' + targetfile
-                if browser_retrieve(base_url+file, targetfile):
+                print 'Downloading:' + base_url+file['link'] + ' to: ' + targetfile
+                if browser_retrieve(base_url+file['link'], targetfile):
                     processed.append(filename)
                     if args.unpack:
                         unpack(targetfile)
@@ -163,7 +167,7 @@ def download_attachments(attachments, target_folder):
             else:
                 processed.append(filename)
                 if args.unpack:
-                    unpack(targetfile)
+                    unpack(unicode(targetfile))
                 print 'Skipping file ' + filename + ': already exists'
     else:
         print 'No attachments found'
