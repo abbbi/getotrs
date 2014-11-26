@@ -2,10 +2,10 @@ getotrs
 =======
 
 Download otrs ticket attachments. Based on the ticket-id syncs all attachments
-to a local folder and if desired decompresses possible archives. Also downloads
-the printable pdf version of the ticket created by otrs.
+to a local folder and if desired decompresses possible archives. 
 
-Uses the new OTRS 4.0.1 REST API
+Uses the new OTRS 4.0.1 REST API, for REST API setup an predefined yml description
+is included, see below.
 
 USAGE
 ------------

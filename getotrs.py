@@ -155,7 +155,6 @@ if __name__ == "__main__":
     parser.add_argument('--user', help='OTRS Username', type=str, required=1)
     parser.add_argument('--pw', help='OTRS Password', type=str, required=1)
     parser.add_argument('--folder', help='Folder to download stuff (default full subject ticket id)', type=str, required=0)
-    parser.add_argument('-p','--pdf', help='Download ticket as printable PDF', action='store_true', required=0)
     parser.add_argument('-u','--unpack', help='Decompress downloaded files based on filetype (zip, tar.gz)', action='store_true', required=0)
     args = parser.parse_args()
 
