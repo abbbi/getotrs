@@ -58,6 +58,15 @@ So simply:
 
 will do the job and places ticket information to /logfiles/2014030680000094 for example.
 
+
+OTRS WebService
+------------
+
+getotrs.yml includes an service description, in otrs 4.0.1 it is possible to import this service description
+with the GenericInterface Webservices administration tool. The URL for this WebService is:
+
+ https://otrs.url.de/otrs/nph-genericinterface.pl/Webservice/getotrs/TicketGet/
+
 DEPENDENCIES
 ------------
 additional packages may have to be installed (debian):

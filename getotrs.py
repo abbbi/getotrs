@@ -85,10 +85,16 @@ def get_json_data(username,password, url):
     try:
         r = requests.get(url, params=payload, verify=False)
     except Exception as e:
-        print 'Error accesing api %s', e
+        print 'Error with api communication: %s', e
         sys.exit(1)
 
-    return json.loads(r.content)
+    try:
+        data =  json.loads(r.content)
+        return data
+    except Exception as e:
+        print 'Unable to parse json: %s' % e
+        print 'Data: %s' % r.content
+        sys.exit(1)
 
 
 def find_attachments(data):
