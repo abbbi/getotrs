@@ -26,8 +26,6 @@ def unpack(file):
     else:
         type = file 
 
-    print "TYPE:" + str(type)
-
     if 'text/plain' in type or type.endswith('.txt'):
         return
 
@@ -123,6 +121,7 @@ def save_attachments(attachments, target_folder):
             if not os.path.exists(targetfile):
                 with open(targetfile, 'w') as FH:
                     FH.write(b64decode(file['content']))
+                    FH.close()
                     processed.append(filename)
                     if args.unpack:
                         unpack(targetfile)
