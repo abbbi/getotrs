@@ -83,7 +83,9 @@ def get_json_data(username,password, url):
         'Attachments' : '1'
     }
     try:
-        r = requests.get(url, params=payload, verify=False)
+        print 'Downloading ticket Data..'
+        r = requests.get(url, params=payload, verify=False) 
+        print "Length: %s " % r.headers.get('content-length')
     except Exception as e:
         print 'Error with api communication: %s', e
         sys.exit(1)
