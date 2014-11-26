@@ -5,6 +5,8 @@ Download otrs ticket attachments. Based on the ticket-id syncs all attachments
 to a local folder and if desired decompresses possible archives. Also downloads
 the printable pdf version of the ticket created by otrs.
 
+Uses the new OTRS 4.0.1 REST API
+
 USAGE
 ------------
 
@@ -19,7 +21,6 @@ optional arguments:
   --user USER      OTRS Username
   --pw PW          OTRS Password
   --folder FOLDER  Folder to download stuff (default full subject ticket id)
-  --pdf            Download ticket as printable PDF
   --unpack         Decompress downloaded files based on filetype (zip, tar.gz)
 </pre>
 
@@ -28,24 +29,20 @@ EXAMPLE
 
 Download all attachments to automatically created folder:
 
- getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password
+ getotrs.py --url https://otrs.url.de/otrs/nph-genericinterface.pl/Webservice/SN/TicketGet/ --ticket 7496 --user username --pw password
 
 Download attachments to specified folder:
 
- getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --folder download
+ getotrs.py --url https://otrs.url.de/otrs/nph-genericinterface.pl/Webservice/SN/TicketGet/ --ticket 7496 --user username --pw password --folder download
 
 Download attachments to specified folder and decompress zipped attachments:
 
- getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --folder download --unpack
-
-Download ticket as printable PDF:
-
- getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --pdf
+ getotrs.py --url https://otrs.url.de/otrs/nph-genericinterface.pl/Webservice/SN/TicketGet/ --ticket 7496 --user username --pw password --folder download --unpack
 
 Predefined path, __ticketid__ is replaced with real ticket number, so files go to /logfiles/<ticketnumber>:
 
 <pre>
- getotrs.py --url https://otrs.url.de/ --user username --pw password --folder /logfiles/_ticketid_ --ticket 7496
+ getotrs.py --url URL --user username --pw password --folder /logfiles/_ticketid_ --ticket 7496
 </pre>
 
 BASHRC
@@ -69,6 +66,8 @@ additional packages may have to be installed (debian):
  python-bs4
  python-mechanize
  python-magic
+ python-json
+ python-base64
 </pre>
 
 TRIVIA

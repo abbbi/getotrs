@@ -147,7 +147,9 @@ if __name__ == "__main__":
     username = args.user
     password = args.pw
 
-    data = get_json_data(username,password,args.url)
+    url = args.url+args.ticket
+
+    data = get_json_data(username,password,url)
     attachments = find_attachments(data)
     tf = set_target_folder(data['Ticket'][0]['TicketNumber'])
     save_attachments(attachments, tf )
