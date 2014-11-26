@@ -1,0 +1,29 @@
+---
+Debugger:
+  DebugThreshold: debug
+  TestMode: '0'
+Description: getotrs download REST definition
+FrameworkVersion: 4.0.1
+Provider:
+  Operation:
+    TicketGet:
+      Description: ''
+      MappingInbound:
+        Type: Simple
+      MappingOutbound:
+        Type: Simple
+      Type: Ticket::TicketGet
+  Transport:
+    Config:
+      KeepAlive: ''
+      MaxLength: '20000'
+      RouteOperationMapping:
+        TicketGet:
+          RequestMethod:
+          - GET
+          Route: /TicketGet/:TicketID
+    Type: HTTP::REST
+RemoteSystem: ''
+Requester:
+  Transport:
+    Type: ''
