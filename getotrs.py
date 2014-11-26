@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 import os
 import argparse
-import mechanize
 import requests
 import zipfile
 import tarfile
+import json
 import sys
+from base64 import b64decode
 if not 'win32' in sys.platform:
     import magic
 
-from bs4 import BeautifulSoup
-
 def unpack(file):
-    file = file.encode('utf-8')
     destdir=file+'_data/'
 
     if os.path.exists(destdir):
@@ -27,7 +25,6 @@ def unpack(file):
             type = file
     else:
         type = file 
-
 
     print "TYPE:" + str(type)
 
@@ -64,41 +61,14 @@ def createdir(destdir):
         print 'Error creating directory:'+ e.strerror
         exit(1)
 
-def login():
-    try:
-        browser.open(base_url+otrs_path)
-    except mechanize.URLError, e:
-        print 'ERROR opening site:' + str(e)
-        exit(1)
-    except mechanize.HTTPError, e:
-        print 'ERROR downloading:' + str(e)
-        exit(1)
-
-    browser.select_form(name='login')
-    browser['User'] = username
-    browser['Password'] = password
-    browser.submit()
-
-    data = BeautifulSoup(browser.response().read())
-
-    if 'Insufficient Rights' in  data.get_text():
-        print 'Unable to open ticket information: wrong url?'
-        exit(1)
-
-    if 'Login failed!' in data.get_text():
-        print 'Login failed! Your username or password was entered incorrectly.'
-        exit(1)
-
-    return data
-
-def set_target_folder(data):
+def set_target_folder(ticket_id):
     if args.folder:
         if '_ticketid_' in args.folder:
-            target_folder = args.folder.replace('_ticketid_', data.title.string.split(' ')[0])
+            target_folder = args.folder.replace('_ticketid_', ticket_id)
         else:
             target_folder= args.folder
     else:
-        target_folder =  data.title.string.split(' ')[0]
+        target_folder =  ticket_id
 
     print 'Target Folder: ' + target_folder
 
@@ -107,41 +77,34 @@ def set_target_folder(data):
 
     return target_folder
 
-def find_attachments(data):
-    attachments=[]
-    for a in data.find_all('a', href=True, text=True):
-        if 'AgentTicketAttachment' in a['href']:
-            if a['href'] not in attachments:
-                print 'Found Attachment:', a['href']
-                attachments.append({'link': a['href'], 'filename':  a.get_text()})
-        if 'AgentTicketPrint;TicketID' in a['href']:
-            if not 'ArticleID' in a['href']:
-                pdf_url = a['href'];
-
-    for l in data.find_all('a',  {'class':"LogoutButton"}):
-        logout_url=l['href']
-        print 'Logout URL: ' + logout_url
-
-    return attachments, logout_url, pdf_url
-
-def download_pdf(pdf_url, target_folder):
-    if args.pdf:
-        print 'Download ticket PDF file: ' + target_folder + '/ticketdata.pdf'
-        if browser_retrieve(base_url+pdf_url, target_folder + '/ticketdata.pdf'):
-            print "OK"
-
-def browser_retrieve(source, dest):
+def get_json_data(username,password, url):
+    payload = {
+        'UserLogin': username,
+        'Password': password,
+        'AllArticles': '1',
+        'Attachments' : '1'
+    }
     try:
-        browser.retrieve(source.encode('ascii', 'ignore'), dest.encode('ascii', 'ignore'))
-        return True
-    except mechanize.URLError, e:
-        print 'ERROR downloading file:' + str(e)
-        return False
-    except mechanize.HTTPError, e:
-        print 'ERROR downloading file:' + str(e)
-        return False
+        r = requests.get(url, params=payload)
+    except e:
+        print 'Error accesing api %s', e
 
-def download_attachments(attachments, target_folder):
+    return json.loads(r.content)
+
+
+def find_attachments(data):
+    attachments = []
+    for td in data['Ticket']:
+        for article in td['Article']:
+            try:
+                for file in article['Attachment']:
+                    attachments.append({ 'filename': file['Filename'], 'content' : file['Content']})
+            except KeyError:
+                print "no attachment for this article"
+
+    return attachments
+
+def save_attachments(attachments, target_folder):
     if len(attachments) > 0:
         processed=[]
         fc = 0
@@ -157,13 +120,11 @@ def download_attachments(attachments, target_folder):
             targetfile = target_folder + '/' + filename
 
             if not os.path.exists(targetfile):
-                print 'Downloading:' + base_url+file['link'] + ' to: ' + targetfile
-                if browser_retrieve(base_url+file['link'], targetfile):
+                with open(targetfile, 'w') as FH:
+                    FH.write(b64decode(file['content']))
                     processed.append(filename)
                     if args.unpack:
                         unpack(targetfile)
-                else:
-                    print "Error downloading"
             else:
                 processed.append(filename)
                 if args.unpack:
@@ -171,15 +132,6 @@ def download_attachments(attachments, target_folder):
                 print 'Skipping file ' + filename + ': already exists'
     else:
         print 'No attachments found'
-
-def logout(logout_url):
-    print 'Logout'
-    p = browser.click_link(url=logout_url)
-    browser.open(p)
-    resp =  BeautifulSoup(browser.response().read())
-    if 'Abmelden' or 'Logout' in  resp.title.string:
-        print "Ok"
-    browser.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -192,15 +144,10 @@ if __name__ == "__main__":
     parser.add_argument('-u','--unpack', help='Decompress downloaded files based on filetype (zip, tar.gz)', action='store_true', required=0)
     args = parser.parse_args()
 
-    base_url = args.url
-    otrs_path = 'otrs/index.pl?Action=AgentTicketZoom;TicketID=' + args.ticket + ';ZoomExpand=1'
     username = args.user
     password = args.pw
 
-    browser=mechanize.Browser()
-    data = login()
-    tf = set_target_folder(data)
-    attachments,logout_url,pdf_url = find_attachments(data)
-    download_pdf(pdf_url, tf)
-    download_attachments(attachments, tf )
-    logout(logout_url)
+    data = get_json_data(username,password,args.url)
+    attachments = find_attachments(data)
+    tf = set_target_folder(data['Ticket'][0]['TicketNumber'])
+    save_attachments(attachments, tf )
