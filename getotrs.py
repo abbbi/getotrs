@@ -20,11 +20,11 @@ def unpack(file):
     if not 'win32' in sys.platform:
         m = magic.open(magic.MIME)
         m.load()
-        type = m.file(file)
+        type = m.file(file.encode('utf-8'))
         if type == None:
             type = file
     else:
-        type = file 
+        type = file
 
     if 'text/plain' in type or type.endswith('.txt'):
         return
@@ -84,9 +84,9 @@ def get_json_data(username,password, url):
     }
     try:
         print 'Downloading ticket Data..'
-        r = requests.get(url, params=payload, verify=False) 
-        print "Length: %s " % r.headers.get('content-length')
+        r = requests.get(url, params=payload, verify=False)
     except Exception as e:
+        print e
         print 'Error with api communication: %s', e
         sys.exit(1)
 
