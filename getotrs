@@ -1,7 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 import os
 import argparse
 import requests
+import urllib3
+urllib3.disable_warnings()
 import zipfile
 import tarfile
 import json
@@ -14,7 +16,7 @@ def unpack(file):
     destdir=file+'_data/'
 
     if os.path.exists(destdir):
-        print 'Skip decompress, already exists: ' + destdir
+        print('Skip decompress, already exists: %s' % destdir)
         return
 
     if not 'win32' in sys.platform:
@@ -30,7 +32,7 @@ def unpack(file):
         return
 
     if 'application/zip' in type or type.endswith('.zip'):
-        print 'Decompress .zip into: ' + destdir
+        print('Decompress .zip into: %s' % destdir)
         createdir(destdir)
         try:
             with zipfile.ZipFile(file) as zf:
@@ -38,25 +40,25 @@ def unpack(file):
                     zf.extractall(destdir)
                     zf.close()
                 except:
-                    print 'error decompressing'
+                    print('error decompressing')
         except zipfile.BadZipfile:
-            print 'Error: file is not a correct zipfile'
+            print('Error: file is not a correct zipfile')
     elif 'application/x-gzip' in type or 'application/x-tar' in type or type.endswith('.tar.gz'):
-        print 'Decompress .tar.z into: ' + destdir
+        print('Decompress .tar.z into: %s' % destdir)
         createdir(destdir)
         if tarfile.is_tarfile(file):
             try:
                 with tarfile.TarFile.open(file) as tf:
                     tf.extractall(destdir)
                     tf.close()
-            except tarfile.ExtractError, e:
-                print 'error decompressing' + str(e)
+            except tarfile.ExtractError as e:
+                print('error decompressing: %s' % str(e))
 
 def createdir(destdir):
     try:
         os.makedirs(destdir)
-    except OSError, e:
-        print 'Error creating directory:'+ e.strerror
+    except OSError as e:
+        print('Error creating directory: %s' % e.strerror)
         exit(1)
 
 def set_target_folder(ticket_id):
@@ -68,7 +70,7 @@ def set_target_folder(ticket_id):
     else:
         target_folder =  ticket_id
 
-    print 'Target Folder: ' + target_folder
+    print('Target Folder: %s' % target_folder)
 
     if not os.path.exists(target_folder):
         createdir(target_folder)
@@ -83,19 +85,19 @@ def get_json_data(username,password, url):
         'Attachments' : '1'
     }
     try:
-        print 'Downloading ticket Data..'
+        print('Downloading ticket Data..')
         r = requests.get(url, params=payload, verify=False)
     except Exception as e:
-        print e
-        print 'Error with api communication: %s', e
+        print(e)
+        print('Error with api communication: %s' % e)
         sys.exit(1)
 
     try:
         data =  json.loads(r.content)
         return data
     except Exception as e:
-        print 'Unable to parse json: %s' % e
-        print 'Data: %s' % r.content
+        print('Unable to parse json: %s' % e)
+        print('Data: %s' % r.content)
         sys.exit(1)
 
 
@@ -103,20 +105,20 @@ def find_attachments(data):
     attachments = []
 
     if len(data) < 1:
-        print 'No valid json data found'
+        print('No valid json data found')
         sys.exit(1)
 
     cnt=0
     for td in data['Ticket']:
-        print 'Ticket has %s articles' % len(td['Article'])
+        print('Ticket has %s articles' % len(td['Article']))
         for article in td['Article']:
             cnt=cnt+1
             try:
-                print 'Article %s has %s attachments' % (cnt, len(article['Attachment']))
+                print('Article %s has %s attachments' % (cnt, len(article['Attachment'])))
                 for file in article['Attachment']:
                     attachments.append({ 'filename': file['Filename'], 'content' : file['Content']})
             except KeyError:
-                print "No attachment for Article %s" % cnt
+                print("No attachment for Article %s" % cnt)
 
     return attachments
 
@@ -136,7 +138,7 @@ def save_attachments(attachments, target_folder):
             targetfile = target_folder + '/' + filename
 
             if not os.path.exists(targetfile):
-                with open(targetfile, 'w') as FH:
+                with open(targetfile, 'wb') as FH:
                     FH.write(b64decode(file['content']))
                     FH.close()
                     processed.append(filename)
@@ -146,9 +148,9 @@ def save_attachments(attachments, target_folder):
                 processed.append(filename)
                 if args.unpack:
                     unpack(unicode(targetfile))
-                print 'Skipping file ' + filename + ': already exists'
+                print('Skipping file: %s already exists' % filename)
     else:
-        print 'No attachments found'
+        print('No attachments found')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
