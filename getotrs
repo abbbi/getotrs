@@ -12,7 +12,7 @@ from base64 import b64decode
 if not 'win32' in sys.platform:
     import magic
 
-__version__ = "0.2"
+__version__ = "0.3"
 
 def unpack(file):
     destdir=file+'_data/'
@@ -24,16 +24,16 @@ def unpack(file):
     if not 'win32' in sys.platform:
         m = magic.open(magic.MIME)
         m.load()
-        type = m.file(file.encode('utf-8'))
-        if type == None:
-            type = file
+        ft = m.file(file.encode('utf-8'))
+        if ft == None:
+            ft = file
     else:
-        type = file
+        ft = file
 
-    if 'text/plain' in type or type.endswith('.txt'):
+    if 'text/plain' in ft or ft.endswith('.txt'):
         return
 
-    if 'application/zip' in type or type.endswith('.zip'):
+    if 'application/zip' in ft or ft.endswith('.zip'):
         print('Decompress .zip into: %s' % destdir)
         createdir(destdir)
         try:
@@ -45,7 +45,7 @@ def unpack(file):
                     print('error decompressing')
         except zipfile.BadZipfile:
             print('Error: file is not a correct zipfile')
-    elif 'application/x-gzip' in type or 'application/x-tar' in type or type.endswith('.tar.gz'):
+    elif ft in ('application/x-gzip','application/x-tar') or ft.endswith('.tar.gz'):
         print('Decompress .tar.z into: %s' % destdir)
         createdir(destdir)
         if tarfile.is_tarfile(file):
