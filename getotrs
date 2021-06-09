@@ -12,6 +12,8 @@ from base64 import b64decode
 if not 'win32' in sys.platform:
     import magic
 
+__version__ = "0.2"
+
 def unpack(file):
     destdir=file+'_data/'
 
