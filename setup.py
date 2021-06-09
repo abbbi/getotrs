@@ -13,7 +13,7 @@ setup(
     author='Michael Ablassmeier',
     author_email='abi@grinser.de',
     license='GPL',
-    keywords='libnbd backup libvirt',
+    keywords='otrs download attachment',
     packages=find_packages(exclude=('docs', 'tests', 'env')),
     include_package_data=True,
     install_requires=[
