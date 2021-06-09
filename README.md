@@ -42,7 +42,7 @@ Download attachments to specified folder and decompress zipped attachments:
 Predefined path, __ticketid__ is replaced with real ticket number, so files go to /logfiles/<ticketnumber>:
 
 <pre>
- `getotrs` --url URL --user username --pw password --folder /logfiles/_ticketid_ --ticket 7496
+ getotrs --url https://otrs.url.de/ --user username --pw password --folder /logfiles/_ticketid_ --ticket 7496
 </pre>
 
 CONFIG
