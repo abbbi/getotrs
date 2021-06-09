@@ -1,0 +1,6 @@
+{
+    "_comment": "Configuration file example for getotrs",
+    "otrs_url": "https://otrs.url/",
+    "username": "MyUserName",
+    "password": "MyPassWord"
+}

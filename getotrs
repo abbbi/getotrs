@@ -159,16 +159,51 @@ def save_attachments(attachments, target_folder):
 
 if __name__ == "__main__":
     API_URL="/otrs/nph-genericinterface.pl/Webservice/getotrs/TicketGet/"
+    if not 'win32' in sys.platform:
+        HOME = os.path.expanduser("~")
+        CONFIG="%s/.getotrs" % HOME
+    else:
+        CONFIG="./.getotrs"
+
+    url_required = 1
+    user_required = 1
+    pass_required = 1
+
+    username=None
+    password=None
+    otrs_url=None
+
+    config = None
+    if os.path.exists(CONFIG):
+        print("Using config: %s" % CONFIG)
+        try:
+            config = json.loads(open(CONFIG).read())
+            print("Using settings from: %s" % CONFIG)
+
+            username = config['username']
+            password = config['password']
+            otrs_url = config['otrs_url']
+
+            url_required = 0
+            user_required = 0
+            pass_required = 0
+        except Exception as e:
+            raise
+            print('Unable to parse config: %s' % e)
+    else:
+        print('Not config file: %s' % CONFIG)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--url',
-        help='Base URL to otrs (http://host/)', type=str, required=1)
+        help='Base URL to otrs (http://host/)', type=str,
+        required=url_required)
     parser.add_argument('--ticket',
         help='Ticket ID as seen in URL (TicketID=7496 = 7496)', type=str,
         required=1)
     parser.add_argument('--user',
-        help='OTRS Username', type=str, required=1)
-    parser.add_argument('--pw', help='OTRS Password', type=str, required=1)
+        help='OTRS Username', type=str, required=user_required)
+    parser.add_argument('--pw',
+        help='OTRS Password', type=str, required=pass_required)
     parser.add_argument('--folder',
         help='Folder to download stuff (default full subject ticket id)',
         type=str, required=0)
@@ -177,8 +212,10 @@ if __name__ == "__main__":
         action='store_true', required=0)
     args = parser.parse_args()
 
-    username = args.user
-    password = args.pw
+    if not config:
+        username = args.user
+        password = args.pw
+        otrs_url = args.url
 
     tl=[]
     if ':' in args.ticket:
@@ -187,7 +224,7 @@ if __name__ == "__main__":
         tl.append(args.ticket)
 
     for ticket in tl:
-        url = args.url+API_URL+ticket
+        url = "%s%s%s" % (otrs_url, API_URL, ticket)
 
         data = get_json_data(username,password,url)
         if 'Error' in data:

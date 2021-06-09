@@ -4,8 +4,8 @@ getotrs
 Download otrs ticket attachments. Based on the ticket-id syncs all attachments
 to a local folder and if desired decompresses possible archives. 
 
-Uses the new OTRS 4.0.1 REST API, for REST API setup an predefined yml description
-is included, see below.
+Uses the new OTRS 4.0.1 REST API, for REST API setup an predefined yml
+description is included, see below.
 
 USAGE
 ------------
@@ -24,40 +24,32 @@ optional arguments:
   --unpack         Decompress downloaded files based on filetype (zip, tar.gz)
 </pre>
 
-EXAMPLE
+EXAMPLES
 ------------
 
 Download all attachments to automatically created folder:
 
- getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password
+ `getotrs` --url https://otrs.url.de/ --ticket 7496 --user username --pw password
 
 Download attachments to specified folder:
 
- getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --folder download
+ `getotrs` --url https://otrs.url.de/ --ticket 7496 --user username --pw password --folder download
 
 Download attachments to specified folder and decompress zipped attachments:
 
- getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --folder download --unpack
+ `getotrs` --url https://otrs.url.de/ --ticket 7496 --user username --pw password --folder download --unpack
 
 Predefined path, __ticketid__ is replaced with real ticket number, so files go to /logfiles/<ticketnumber>:
 
 <pre>
- getotrs.py --url URL --user username --pw password --folder /logfiles/_ticketid_ --ticket 7496
+ `getotrs` --url URL --user username --pw password --folder /logfiles/_ticketid_ --ticket 7496
 </pre>
 
-BASHRC
+CONFIG
 ------------
 
-<pre>
- alias getotrs='python /path/to/getotrs.py --url https://otrs.url.de/ --user username --pw password --folder /logfiles/_ticketid_ --ticket'
-</pre>
-
-So simply:
-
- getotrs 7545
-
-will do the job and places ticket information to /logfiles/2014030680000094 for example.
-
+By default getotrs attempts to load `~/.getotrs` as config file, which can be
+used to configure username/url/password. See example file.
 
 OTRS WebService
 ------------
@@ -66,18 +58,6 @@ getotrs.yml includes an service description, in otrs 4.0.1 it is possible to imp
 with the GenericInterface Webservices administration tool. The URL for this WebService is:
 
  https://otrs.url.de/otrs/nph-genericinterface.pl/Webservice/getotrs/TicketGet/
-
-DEPENDENCIES
-------------
-additional packages may have to be installed (debian):
-
-<pre>
- python-bs4
- python-mechanize
- python-magic
- python-json
- python-base64
-</pre>
 
 TRIVIA
 ------------
