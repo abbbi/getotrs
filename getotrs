@@ -158,6 +158,8 @@ def save_attachments(attachments, target_folder):
         print('No attachments found')
 
 if __name__ == "__main__":
+    API_URL="/otrs/nph-genericinterface.pl/Webservice/getotrs/TicketGet/"
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--url',
         help='Base URL to otrs (http://host/)', type=str, required=1)
@@ -185,7 +187,7 @@ if __name__ == "__main__":
         tl.append(args.ticket)
 
     for ticket in tl:
-        url = args.url+ticket
+        url = args.url+API_URL+ticket
 
         data = get_json_data(username,password,url)
         if 'Error' in data:

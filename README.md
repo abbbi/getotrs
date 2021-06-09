@@ -29,15 +29,15 @@ EXAMPLE
 
 Download all attachments to automatically created folder:
 
- getotrs.py --url https://otrs.url.de/otrs/nph-genericinterface.pl/Webservice/SN/TicketGet/ --ticket 7496 --user username --pw password
+ getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password
 
 Download attachments to specified folder:
 
- getotrs.py --url https://otrs.url.de/otrs/nph-genericinterface.pl/Webservice/SN/TicketGet/ --ticket 7496 --user username --pw password --folder download
+ getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --folder download
 
 Download attachments to specified folder and decompress zipped attachments:
 
- getotrs.py --url https://otrs.url.de/otrs/nph-genericinterface.pl/Webservice/SN/TicketGet/ --ticket 7496 --user username --pw password --folder download --unpack
+ getotrs.py --url https://otrs.url.de/ --ticket 7496 --user username --pw password --folder download --unpack
 
 Predefined path, __ticketid__ is replaced with real ticket number, so files go to /logfiles/<ticketnumber>:
 
