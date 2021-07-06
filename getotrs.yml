@@ -1,6 +1,6 @@
 ---
 Debugger:
-  DebugThreshold: debug
+  DebugThreshold: error
   TestMode: '0'
 Description: getotrs download REST definition
 FrameworkVersion: 4.0.1

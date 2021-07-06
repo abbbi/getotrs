@@ -12,7 +12,7 @@ from base64 import b64decode
 if not 'win32' in sys.platform:
     import magic
 
-__version__ = "0.4"
+__version__ = "0.5"
 
 def unpack(archive):
     destdir=archive+'_data/'
