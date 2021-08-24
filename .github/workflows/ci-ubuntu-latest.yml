@@ -1,0 +1,22 @@
+name: CI on ubuntu-latest
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Python code format test
+      run: |
+        sudo pip3 install black
+        black --check getotrs
+        black --check .
+    - name: Install requirements
+      run: sudo pip3 install -r requirements.txt
+    - name: Install getotrs
+      run: sudo python3 setup.py install
+    - name: Execute
+      run: getotrs -h

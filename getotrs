@@ -3,38 +3,41 @@ import os
 import argparse
 import requests
 import urllib3
+
 urllib3.disable_warnings()
 import zipfile
 import tarfile
 import json
 import sys
 from base64 import b64decode
-if not 'win32' in sys.platform:
+
+if not "win32" in sys.platform:
     import magic
 
-__version__ = "0.5"
+__version__ = "0.6"
+
 
 def unpack(archive):
-    destdir=archive+'_data/'
+    destdir = archive + "_data/"
 
     if os.path.exists(destdir):
-        print('Skip decompress, already exists: %s' % destdir)
+        print("Skip decompress, already exists: %s" % destdir)
         return
 
-    if not 'win32' in sys.platform:
+    if not "win32" in sys.platform:
         m = magic.open(magic.MIME)
         m.load()
-        fileType = m.file(archive.encode('utf-8'))
-        if fileType  == None:
+        fileType = m.file(archive.encode("utf-8"))
+        if fileType == None:
             fileType = archive
     else:
         fileType = archive
 
-    if 'text/plain' in fileType or fileType.endswith('.txt'):
+    if "text/plain" in fileType or fileType.endswith(".txt"):
         return
 
-    if 'application/zip' in fileType or fileType.endswith('.zip'):
-        print('Decompress .zip into: %s' % destdir)
+    if "application/zip" in fileType or fileType.endswith(".zip"):
+        print("Decompress .zip into: %s" % destdir)
         createdir(destdir)
         try:
             with zipfile.ZipFile(archive) as zf:
@@ -42,11 +45,15 @@ def unpack(archive):
                     zf.extractall(destdir)
                     zf.close()
                 except:
-                    print('error decompressing')
+                    print("error decompressing")
         except zipfile.BadZipfile:
-            print('Error: file is not a correct zipfile')
-    elif fileType in ('application/x-gzip','application/x-tar') or archive.endswith('.tar.gz') or archive.endswith('.tgz'):
-        print('Decompress .tar.z into: %s' % destdir)
+            print("Error: file is not a correct zipfile")
+    elif (
+        fileType in ("application/x-gzip", "application/x-tar")
+        or archive.endswith(".tar.gz")
+        or archive.endswith(".tgz")
+    ):
+        print("Decompress .tar.z into: %s" % destdir)
         createdir(destdir)
         if tarfile.is_tarfile(archive):
             try:
@@ -54,52 +61,55 @@ def unpack(archive):
                     tf.extractall(destdir)
                     tf.close()
             except tarfile.ExtractError as e:
-                print('error decompressing: %s' % str(e))
+                print("error decompressing: %s" % str(e))
+
 
 def createdir(destdir):
     try:
         os.makedirs(destdir)
     except OSError as e:
-        print('Error creating directory: %s' % e.strerror)
+        print("Error creating directory: %s" % e.strerror)
         exit(1)
+
 
 def set_target_folder(ticket_id):
     if args.folder:
-        if '_ticketid_' in args.folder:
-            target_folder = args.folder.replace('_ticketid_', ticket_id)
+        if "_ticketid_" in args.folder:
+            target_folder = args.folder.replace("_ticketid_", ticket_id)
         else:
-            target_folder= args.folder
+            target_folder = args.folder
     else:
-        target_folder =  ticket_id
+        target_folder = ticket_id
 
-    print('Target Folder: %s' % target_folder)
+    print("Target Folder: %s" % target_folder)
 
     if not os.path.exists(target_folder):
         createdir(target_folder)
 
     return target_folder
 
-def get_json_data(username,password, url):
+
+def get_json_data(username, password, url):
     payload = {
-        'UserLogin': username,
-        'Password': password,
-        'AllArticles': '1',
-        'Attachments' : '1'
+        "UserLogin": username,
+        "Password": password,
+        "AllArticles": "1",
+        "Attachments": "1",
     }
     try:
-        print('Downloading ticket Data..')
+        print("Downloading ticket Data..")
         r = requests.get(url, params=payload, verify=False)
     except Exception as e:
         print(e)
-        print('Error with api communication: %s' % e)
+        print("Error with api communication: %s" % e)
         sys.exit(1)
 
     try:
-        data =  json.loads(r.content)
+        data = json.loads(r.content)
         return data
     except Exception as e:
-        print('Unable to parse json: %s' % e)
-        print('Data: %s' % r.content)
+        print("Unable to parse json: %s" % e)
+        print("Data: %s" % r.content)
         sys.exit(1)
 
 
@@ -107,46 +117,46 @@ def find_attachments(data):
     attachments = []
 
     if len(data) < 1:
-        print('No valid json data found')
+        print("No valid json data found")
         sys.exit(1)
 
-    cnt=0
-    for td in data['Ticket']:
-        print('Ticket has %s articles' % len(td['Article']))
-        for article in td['Article']:
-            cnt=cnt+1
+    cnt = 0
+    for td in data["Ticket"]:
+        print("Ticket has %s articles" % len(td["Article"]))
+        for article in td["Article"]:
+            cnt = cnt + 1
             try:
-                print('Article %s has %s attachments' % (
-                    cnt, len(article['Attachment']))
+                print(
+                    "Article %s has %s attachments" % (cnt, len(article["Attachment"]))
                 )
-                for file in article['Attachment']:
+                for file in article["Attachment"]:
                     attachments.append(
-                        { 'filename': file['Filename'],
-                         'content' : file['Content']}
+                        {"filename": file["Filename"], "content": file["Content"]}
                     )
             except KeyError:
                 print("No attachment for Article %s" % cnt)
 
     return attachments
 
+
 def save_attachments(attachments, target_folder):
     if len(attachments) > 0:
-        processed=[]
+        processed = []
         fc = 0
         for file in attachments:
-            filename = file['filename']
+            filename = file["filename"]
 
             pc = processed.count(filename)
 
             if pc > 0:
-                fc=fc+1
-                filename=str(fc)+'_'+filename
+                fc = fc + 1
+                filename = str(fc) + "_" + filename
 
-            targetfile = target_folder + '/' + filename
+            targetfile = target_folder + "/" + filename
 
             if not os.path.exists(targetfile):
-                with open(targetfile, 'wb') as FH:
-                    FH.write(b64decode(file['content']))
+                with open(targetfile, "wb") as FH:
+                    FH.write(b64decode(file["content"]))
                     FH.close()
                     processed.append(filename)
                     if args.unpack:
@@ -155,25 +165,26 @@ def save_attachments(attachments, target_folder):
                 processed.append(filename)
                 if args.unpack:
                     unpack(targetfile)
-                print('Skipping file: %s already exists' % filename)
+                print("Skipping file: %s already exists" % filename)
     else:
-        print('No attachments found')
+        print("No attachments found")
+
 
 if __name__ == "__main__":
-    API_URL="/otrs/nph-genericinterface.pl/Webservice/getotrs/TicketGet/"
-    if not 'win32' in sys.platform:
+    API_URL = "/otrs/nph-genericinterface.pl/Webservice/getotrs/TicketGet/"
+    if not "win32" in sys.platform:
         HOME = os.path.expanduser("~")
-        CONFIG="%s/.getotrs" % HOME
+        CONFIG = "%s/.getotrs" % HOME
     else:
-        CONFIG="./.getotrs"
+        CONFIG = "./.getotrs"
 
     url_required = 1
     user_required = 1
     pass_required = 1
 
-    username=None
-    password=None
-    otrs_url=None
+    username = None
+    password = None
+    otrs_url = None
 
     config = None
     if os.path.exists(CONFIG):
@@ -182,36 +193,46 @@ if __name__ == "__main__":
             config = json.loads(open(CONFIG).read())
             print("Using settings from: %s" % CONFIG)
 
-            username = config['username']
-            password = config['password']
-            otrs_url = config['otrs_url']
+            username = config["username"]
+            password = config["password"]
+            otrs_url = config["otrs_url"]
 
             url_required = 0
             user_required = 0
             pass_required = 0
         except Exception as e:
             raise
-            print('Unable to parse config: %s' % e)
+            print("Unable to parse config: %s" % e)
     else:
-        print('Not config file: %s' % CONFIG)
+        print("Not config file: %s" % CONFIG)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--url',
-        help='Base URL to otrs (http://host/)', type=str,
-        required=url_required)
-    parser.add_argument('--ticket',
-        help='Ticket ID as seen in URL (TicketID=7496 = 7496)', type=str,
-        required=1)
-    parser.add_argument('--user',
-        help='OTRS Username', type=str, required=user_required)
-    parser.add_argument('--pw',
-        help='OTRS Password', type=str, required=pass_required)
-    parser.add_argument('--folder',
-        help='Folder to download stuff (default full subject ticket id)',
-        type=str, required=0)
-    parser.add_argument('-u','--unpack',
-        help='Decompress downloaded files based on filetype (zip, tar.gz)',
-        action='store_true', required=0)
+    parser.add_argument(
+        "--url", help="Base URL to otrs (http://host/)", type=str, required=url_required
+    )
+    parser.add_argument(
+        "--ticket",
+        help="Ticket ID as seen in URL (TicketID=7496 = 7496)",
+        type=str,
+        required=1,
+    )
+    parser.add_argument(
+        "--user", help="OTRS Username", type=str, required=user_required
+    )
+    parser.add_argument("--pw", help="OTRS Password", type=str, required=pass_required)
+    parser.add_argument(
+        "--folder",
+        help="Folder to download stuff (default full subject ticket id)",
+        type=str,
+        required=0,
+    )
+    parser.add_argument(
+        "-u",
+        "--unpack",
+        help="Decompress downloaded files based on filetype (zip, tar.gz)",
+        action="store_true",
+        required=0,
+    )
     args = parser.parse_args()
 
     if not config:
@@ -219,21 +240,19 @@ if __name__ == "__main__":
         password = args.pw
         otrs_url = args.url
 
-    tl=[]
-    if ':' in args.ticket:
-        tl = args.ticket.split(':')
+    tl = []
+    if ":" in args.ticket:
+        tl = args.ticket.split(":")
     else:
         tl.append(args.ticket)
 
     for ticket in tl:
         url = "%s%s%s" % (otrs_url, API_URL, ticket)
 
-        data = get_json_data(username,password,url)
-        if 'Error' in data:
-            print('Unable to get ticket data: %s' %
-                data['Error']['ErrorMessage']
-            )
+        data = get_json_data(username, password, url)
+        if "Error" in data:
+            print("Unable to get ticket data: %s" % data["Error"]["ErrorMessage"])
             sys.exit(1)
-        tf = set_target_folder(data['Ticket'][0]['TicketNumber'])
+        tf = set_target_folder(data["Ticket"][0]["TicketNumber"])
         attachments = find_attachments(data)
-        save_attachments(attachments, tf )
+        save_attachments(attachments, tf)
